@@ -22,18 +22,15 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.Packet;
-import ua.nanit.limbo.protocol.PacketSnapshot;
+import ua.nanit.limbo.protocol.PacketOut;
 import ua.nanit.limbo.protocol.registry.State;
-import ua.nanit.limbo.protocol.registry.Version;
 import ua.nanit.limbo.server.Log;
 
 public class PacketEncoder extends MessageToByteEncoder<Packet> {
 
     private State.PacketRegistry registry;
-    private Version version;
 
     public PacketEncoder() {
-        updateVersion(Version.getMin());
         updateState(State.HANDSHAKING);
     }
 
@@ -44,8 +41,8 @@ public class PacketEncoder extends MessageToByteEncoder<Packet> {
         ByteMessage msg = new ByteMessage(out);
         int packetId;
 
-        if (packet instanceof PacketSnapshot) {
-            packetId = registry.getPacketId(((PacketSnapshot)packet).getWrappedPacket().getClass());
+        if (packet instanceof PacketOut) {
+            packetId = registry.getPacketId(((PacketOut) packet).getClass());
         } else {
             packetId = registry.getPacketId(packet.getClass());
         }
@@ -58,7 +55,7 @@ public class PacketEncoder extends MessageToByteEncoder<Packet> {
         msg.writeVarInt(packetId);
 
         try {
-            packet.encode(msg, version);
+            packet.encode(msg);
 
             if (Log.isDebug()) {
                 Log.debug("Sending %s[0x%s] packet (%d bytes)", packet.toString(), Integer.toHexString(packetId), msg.readableBytes());
@@ -68,12 +65,8 @@ public class PacketEncoder extends MessageToByteEncoder<Packet> {
         }
     }
 
-    public void updateVersion(Version version) {
-        this.version = version;
-    }
-
     public void updateState(State state) {
-        this.registry = state.clientBound.getRegistry(version);
+        this.registry = state.clientBound.getRegistry();
     }
 
 }

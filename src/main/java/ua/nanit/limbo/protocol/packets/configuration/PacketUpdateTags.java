@@ -5,7 +5,6 @@ import net.kyori.adventure.nbt.IntBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketOut;
-import ua.nanit.limbo.protocol.registry.Version;
 
 import java.util.Set;
 
@@ -22,7 +21,7 @@ public class PacketUpdateTags implements PacketOut {
     }
 
     @Override
-    public void encode(ByteMessage msg, Version version) {
+    public void encode(ByteMessage msg) {
         Set<String> names = this.tags.keySet();
         msg.writeVarInt(names.size());
         for (String name : names) {

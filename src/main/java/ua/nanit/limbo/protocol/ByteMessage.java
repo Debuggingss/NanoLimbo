@@ -22,7 +22,6 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import io.netty.util.ByteProcessor;
 import net.kyori.adventure.nbt.*;
-import ua.nanit.limbo.protocol.registry.Version;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -252,12 +251,8 @@ public class ByteMessage extends ByteBuf {
         }
     }
 
-    public void writeNbtMessage(NbtMessage nbtMessage, Version version) {
-        if (version.moreOrEqual(Version.V1_20_3)) {
-            writeNamelessCompoundTag(nbtMessage.getTag());
-        } else {
-            writeString(nbtMessage.getJson());
-        }
+    public void writeNbtMessage(NbtMessage nbtMessage) {
+        writeNamelessCompoundTag(nbtMessage.getTag());
     }
 
     public <E extends Enum<E>> void writeEnumSet(EnumSet<E> enumset, Class<E> oclass) {

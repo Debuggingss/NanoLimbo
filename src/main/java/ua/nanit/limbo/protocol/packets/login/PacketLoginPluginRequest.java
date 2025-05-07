@@ -20,7 +20,6 @@ package ua.nanit.limbo.protocol.packets.login;
 import io.netty.buffer.ByteBuf;
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketOut;
-import ua.nanit.limbo.protocol.registry.Version;
 
 public class PacketLoginPluginRequest implements PacketOut {
 
@@ -41,7 +40,7 @@ public class PacketLoginPluginRequest implements PacketOut {
     }
 
     @Override
-    public void encode(ByteMessage msg, Version version) {
+    public void encode(ByteMessage msg) {
         msg.writeVarInt(messageId);
         msg.writeString(channel);
         msg.writeBytes(data);

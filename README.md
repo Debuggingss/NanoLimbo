@@ -1,11 +1,8 @@
-## NanoLimbo
+## NanoLimbo Lite
 
-This is a lightweight Minecraft limbo server, written in Java with Netty.
-The main goal of this project is maximum simplicity with a minimum number of sent and processed packets.
-The limbo is empty; there is no ability to set a schematic building since this is not necessary.
-You can send useful information via chat or boss bar.
+This fork of [NanoLimbo](https://github.com/Nan1t/NanoLimbo) does **NOT** provide multi-version support. Only **1.21.5** is supported.
 
-The server is fully clear. It is only able to keep a lot of players while the main server is down.
+This is an *even lighter* lightweight Minecraft limbo server, written in Java with Netty.
 
 General features:
 * High performance. The server doesn't save or cache any useless (for limbo) data.
@@ -15,30 +12,6 @@ General features:
 * Multiple versions support.
 * Fully configurable.
 * Lightweight. App size around **3MB**.
-
-![](https://i.imgur.com/sT8p1Gz.png)
-
-### Versions support
-
-Symbol `X` means all minor versions.
-
-- [x] 1.7.X
-- [x] 1.8.X
-- [x] 1.9.X
-- [x] 1.10.X
-- [x] 1.11.X
-- [x] 1.12.X
-- [x] 1.13.X
-- [x] 1.14.X
-- [x] 1.15.X
-- [x] 1.16.X
-- [x] 1.17.X
-- [x] 1.18.X
-- [x] 1.19.X
-- [x] 1.20.X
-- [x] 1.21
-
-The server **doesn't** support snapshots.
 
 ### Commands
 
@@ -53,9 +26,9 @@ Note that the server also will be closed correctly if you just press `Ctrl+C`.
 
 Required software: JRE 11+
 
-The installation process is simple.
+The installation process is *almost* simple.
 
-1. Download the latest version of the program [**here**](https://github.com/Nan1t/NanoLimbo/releases).
+1. Build the jar.
 2. Put the jar file in the folder you want.
 3. Create a start script as you did for Bukkit or BungeeCord, with a command like this:
    `java -jar NanoLimbo-<version>.jar`
@@ -76,11 +49,6 @@ Velocity config into `secret` field.
 If you installed BungeeGuard on your proxy, then use `BUNGEE_GUARD` forwarding type.
 Then add your tokens to `tokens` list.
 
-### Contributing
-
-Feel free to create a pull request if you find some bug or optimization opportunity, or if you want
-to add some functionality that is suitable for a limbo server and won't significantly load the server.
-
 ### Building
 
 Required software:
@@ -93,7 +61,3 @@ To build a minimized jar, go to the project root directory and run in the termin
 ```
 ./gradlew shadowJar
 ```
-
-### Contacts
-
-If you have any questions or suggestions, join our [Discord server](https://discord.gg/4VGP3Gv)!

@@ -19,7 +19,6 @@ package ua.nanit.limbo.protocol.packets.play;
 
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.Packet;
-import ua.nanit.limbo.protocol.registry.Version;
 
 public class PacketKeepAlive implements Packet {
 
@@ -34,25 +33,13 @@ public class PacketKeepAlive implements Packet {
     }
 
     @Override
-    public void encode(ByteMessage msg, Version version) {
-        if (version.moreOrEqual(Version.V1_12_2)) {
-            msg.writeLong(id);
-        } else if (version.moreOrEqual(Version.V1_8)) {
-            msg.writeVarInt((int) id);
-        } else {
-            msg.writeInt((int) id);
-        }
+    public void encode(ByteMessage msg) {
+        msg.writeLong(id);
     }
 
     @Override
-    public void decode(ByteMessage msg, Version version) {
-        if (version.moreOrEqual(Version.V1_12_2)) {
-            this.id = msg.readLong();
-        } else if (version.moreOrEqual(Version.V1_8)) {
-            this.id = msg.readVarInt();
-        } else {
-            this.id = msg.readInt();
-        }
+    public void decode(ByteMessage msg) {
+        this.id = msg.readLong();
     }
 
     @Override

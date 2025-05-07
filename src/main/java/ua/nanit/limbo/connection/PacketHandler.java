@@ -43,11 +43,10 @@ public class PacketHandler {
     }
 
     public void handle(ClientConnection conn, PacketHandshake packet) {
-        conn.updateVersion(packet.getVersion());
+        conn.updateProtocolVersion(packet.getProtocolVersion());
         conn.updateState(packet.getNextState());
 
-        Log.debug("Pinged from %s [%s]", conn.getAddress(),
-                conn.getClientVersion().toString());
+        Log.debug("Pinged from %s [%s]", conn.getAddress(), conn.getProtocolVersion());
 
         if (server.getConfig().getInfoForwarding().isLegacy()) {
             String[] split = packet.getHost().split("\00");
@@ -80,7 +79,7 @@ public class PacketHandler {
             return;
         }
 
-        if (!conn.getClientVersion().isSupported()) {
+        if (conn.getProtocolVersion() != LimboConstants.SUPPORTED_VERSION) {
             conn.disconnectLogin("Unsupported client version");
             return;
         }

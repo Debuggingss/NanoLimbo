@@ -20,7 +20,6 @@ package ua.nanit.limbo.protocol.packets.status;
 import ua.nanit.limbo.connection.ClientConnection;
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.Packet;
-import ua.nanit.limbo.protocol.registry.Version;
 import ua.nanit.limbo.server.LimboServer;
 
 public class PacketStatusPing implements Packet {
@@ -28,12 +27,12 @@ public class PacketStatusPing implements Packet {
     private long randomId;
 
     @Override
-    public void encode(ByteMessage msg, Version version) {
+    public void encode(ByteMessage msg) {
         msg.writeLong(randomId);
     }
 
     @Override
-    public void decode(ByteMessage msg, Version version) {
+    public void decode(ByteMessage msg) {
         this.randomId = msg.readLong();
     }
 

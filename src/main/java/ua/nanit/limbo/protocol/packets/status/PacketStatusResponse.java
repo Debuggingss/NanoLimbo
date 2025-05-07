@@ -17,9 +17,9 @@
 
 package ua.nanit.limbo.protocol.packets.status;
 
+import ua.nanit.limbo.LimboConstants;
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketOut;
-import ua.nanit.limbo.protocol.registry.Version;
 import ua.nanit.limbo.server.LimboServer;
 
 public class PacketStatusResponse implements PacketOut {
@@ -35,17 +35,8 @@ public class PacketStatusResponse implements PacketOut {
     }
 
     @Override
-    public void encode(ByteMessage msg, Version version) {
-        int protocol;
-        int staticProtocol =  server.getConfig().getPingData().getProtocol();
-
-        if (staticProtocol > 0) {
-            protocol = staticProtocol;
-        } else {
-            protocol = server.getConfig().getInfoForwarding().isNone()
-                    ? version.getProtocolNumber()
-                    : Version.getMax().getProtocolNumber();
-        }
+    public void encode(ByteMessage msg) {
+        int protocol = LimboConstants.SUPPORTED_VERSION;
 
         String ver = server.getConfig().getPingData().getVersion();
         String desc = server.getConfig().getPingData().getDescription();

@@ -19,7 +19,6 @@ package ua.nanit.limbo.protocol.packets.play;
 
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketOut;
-import ua.nanit.limbo.protocol.registry.Version;
 
 public class PacketPluginMessage implements PacketOut {
 
@@ -35,7 +34,7 @@ public class PacketPluginMessage implements PacketOut {
     }
 
     @Override
-    public void encode(ByteMessage msg, Version version) {
+    public void encode(ByteMessage msg) {
         msg.writeString(channel);
         msg.writeString(message);
     }

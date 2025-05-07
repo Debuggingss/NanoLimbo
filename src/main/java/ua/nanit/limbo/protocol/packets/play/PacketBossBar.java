@@ -19,7 +19,6 @@ package ua.nanit.limbo.protocol.packets.play;
 
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketOut;
-import ua.nanit.limbo.protocol.registry.Version;
 import ua.nanit.limbo.server.data.BossBar;
 
 import java.util.UUID;
@@ -46,10 +45,10 @@ public class PacketBossBar implements PacketOut {
     }
 
     @Override
-    public void encode(ByteMessage msg, Version version) {
+    public void encode(ByteMessage msg) {
         msg.writeUuid(uuid);
         msg.writeVarInt(0); // Create bossbar
-        msg.writeNbtMessage(bossBar.getText(), version);
+        msg.writeNbtMessage(bossBar.getText());
         msg.writeFloat(bossBar.getHealth());
         msg.writeVarInt(bossBar.getColor().getIndex());
         msg.writeVarInt(bossBar.getDivision().getIndex());

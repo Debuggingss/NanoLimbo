@@ -23,7 +23,6 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.Packet;
 import ua.nanit.limbo.protocol.registry.State;
-import ua.nanit.limbo.protocol.registry.Version;
 import ua.nanit.limbo.server.Log;
 
 import java.util.List;
@@ -31,10 +30,8 @@ import java.util.List;
 public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     private State.PacketRegistry mappings;
-    private Version version;
 
     public PacketDecoder() {
-        updateVersion(Version.getMin());
         updateState(State.HANDSHAKING);
     }
 
@@ -49,7 +46,7 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
         if (packet != null) {
             Log.debug("Received packet %s[0x%s] (%d bytes)", packet.toString(), Integer.toHexString(packetId), msg.readableBytes());
             try {
-                packet.decode(msg, version);
+                packet.decode(msg);
             } catch (Exception e) {
                 if (Log.isDebug()) {
                     Log.warning("Cannot decode packet 0x%s", e, Integer.toHexString(packetId));
@@ -64,11 +61,7 @@ public class PacketDecoder extends MessageToMessageDecoder<ByteBuf> {
         }
     }
 
-    public void updateVersion(Version version) {
-        this.version = version;
-    }
-
     public void updateState(State state) {
-        this.mappings = state.serverBound.getRegistry(version);
+        this.mappings = state.serverBound.getRegistry();
     }
 }

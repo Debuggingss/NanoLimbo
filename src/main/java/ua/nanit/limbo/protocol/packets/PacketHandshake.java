@@ -21,18 +21,17 @@ import ua.nanit.limbo.connection.ClientConnection;
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketIn;
 import ua.nanit.limbo.protocol.registry.State;
-import ua.nanit.limbo.protocol.registry.Version;
 import ua.nanit.limbo.server.LimboServer;
 
 public class PacketHandshake implements PacketIn {
 
-    private Version version;
+    private int protocolVersion;
     private String host;
     private int port;
     private State nextState;
 
-    public Version getVersion() {
-        return version;
+    public int getProtocolVersion() {
+        return protocolVersion;
     }
 
     public String getHost() {
@@ -48,11 +47,11 @@ public class PacketHandshake implements PacketIn {
     }
 
     @Override
-    public void decode(ByteMessage msg, Version version) {
+    public void decode(ByteMessage msg) {
         try {
-            this.version = Version.of(msg.readVarInt());
+            this.protocolVersion = msg.readVarInt();
         } catch (IllegalArgumentException e) {
-            this.version = Version.UNDEFINED;
+            this.protocolVersion = 0;
         }
 
         this.host = msg.readString();

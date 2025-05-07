@@ -1,10 +1,7 @@
 package ua.nanit.limbo.protocol.packets.play;
 
-import net.kyori.adventure.nbt.CompoundBinaryTag;
-import net.kyori.adventure.nbt.LongArrayBinaryTag;
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketOut;
-import ua.nanit.limbo.protocol.registry.Version;
 
 public class PacketEmptyChunk implements PacketOut {
 
@@ -20,29 +17,21 @@ public class PacketEmptyChunk implements PacketOut {
     }
 
     @Override
-    public void encode(ByteMessage msg, Version version) {
+    public void encode(ByteMessage msg) {
         msg.writeInt(x);
         msg.writeInt(z);
 
-        if (version.moreOrEqual(Version.V1_21_5)) {
-            msg.writeVarInt(1); // Array length
-            msg.writeVarInt(4); // Motionblock type
-            long[] motionBlockins = new long[37];
-            msg.writeVarInt(motionBlockins.length);
-            for (long data : motionBlockins) {
-                msg.writeLong(data);
-            }
-        } else {
-            LongArrayBinaryTag longArrayTag = LongArrayBinaryTag.longArrayBinaryTag(new long[37]);
-            CompoundBinaryTag tag = CompoundBinaryTag.builder()
-                    .put("MOTION_BLOCKING", longArrayTag).build();
-            CompoundBinaryTag rootTag = CompoundBinaryTag.builder()
-                    .put("root", tag).build();
-            msg.writeNamelessCompoundTag(rootTag);
+        msg.writeVarInt(1); // Array length
+        msg.writeVarInt(4); // Motionblock type
+        long[] motionBlockins = new long[37];
+        msg.writeVarInt(motionBlockins.length);
+        for (long data : motionBlockins) {
+            msg.writeLong(data);
         }
 
-        int sections = (version.moreOrEqual(Version.V1_20_5) ? 24 : 16);
-        byte[] sectionData = (version.moreOrEqual(Version.V1_21_5) ? new byte[]{0, 0, 0, 0, 0, 0, 0, 0} : new byte[]{0, 0, 0, 0, 0, 0, 1, 0});
+        int sections = 24;
+        byte[] sectionData = new byte[]{0, 0, 0, 0, 0, 0, 0, 0};
+
         msg.writeVarInt(sectionData.length * sections);
         for (int i = 0; i < sections; i++) {
             msg.writeBytes(sectionData);

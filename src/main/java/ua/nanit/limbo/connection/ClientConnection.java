@@ -30,11 +30,10 @@ import ua.nanit.limbo.connection.pipeline.PacketDecoder;
 import ua.nanit.limbo.connection.pipeline.PacketEncoder;
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.Packet;
-import ua.nanit.limbo.protocol.PacketSnapshot;
+import ua.nanit.limbo.protocol.PacketOut;
 import ua.nanit.limbo.protocol.packets.login.PacketDisconnect;
 import ua.nanit.limbo.protocol.packets.play.PacketKeepAlive;
 import ua.nanit.limbo.protocol.registry.State;
-import ua.nanit.limbo.protocol.registry.Version;
 import ua.nanit.limbo.server.LimboServer;
 import ua.nanit.limbo.server.Log;
 import ua.nanit.limbo.util.UuidUtil;
@@ -60,7 +59,7 @@ public class ClientConnection extends ChannelInboundHandlerAdapter {
     private final PacketEncoder encoder;
 
     private State state;
-    private Version clientVersion;
+    private int protocolVersion;
     private SocketAddress address;
 
     private int velocityLoginMessageId = -1;
@@ -86,8 +85,8 @@ public class ClientConnection extends ChannelInboundHandlerAdapter {
         return address;
     }
 
-    public Version getClientVersion() {
-        return clientVersion;
+    public int getProtocolVersion() {
+        return protocolVersion;
     }
 
     public GameProfile getGameProfile() {
@@ -130,13 +129,7 @@ public class ClientConnection extends ChannelInboundHandlerAdapter {
 
         server.getConnections().addConnection(this);
 
-        // Preparing for configuration mode
-        if (clientVersion.moreOrEqual(Version.V1_20_2)) {
-            updateEncoderState(State.CONFIGURATION);
-            return;
-        }
-
-        spawnPlayer();
+        updateEncoderState(State.CONFIGURATION);
     }
 
     public void spawnPlayer() {
@@ -146,51 +139,37 @@ public class ClientConnection extends ChannelInboundHandlerAdapter {
             writePacket(PacketSnapshots.PACKET_JOIN_GAME);
             writePacket(PacketSnapshots.PACKET_PLAYER_ABILITIES);
 
-            if (clientVersion.less(Version.V1_9)) {
-                writePacket(PacketSnapshots.PACKET_PLAYER_POS_AND_LOOK_LEGACY);
-            } else {
-                writePacket(PacketSnapshots.PACKET_PLAYER_POS_AND_LOOK);
-            }
+            writePacket(PacketSnapshots.PACKET_PLAYER_POS_AND_LOOK);
+            writePacket(PacketSnapshots.PACKET_SPAWN_POSITION);
 
-            if (clientVersion.moreOrEqual(Version.V1_19_3))
-                writePacket(PacketSnapshots.PACKET_SPAWN_POSITION);
-
-            if (server.getConfig().isUsePlayerList() || clientVersion.equals(Version.V1_16_4))
+            if (server.getConfig().isUsePlayerList())
                 writePacket(PacketSnapshots.PACKET_PLAYER_INFO);
 
-            if (clientVersion.moreOrEqual(Version.V1_13)) {
-                writePacket(PacketSnapshots.PACKET_DECLARE_COMMANDS);
+            writePacket(PacketSnapshots.PACKET_DECLARE_COMMANDS);
 
-                if (PacketSnapshots.PACKET_PLUGIN_MESSAGE != null)
-                    writePacket(PacketSnapshots.PACKET_PLUGIN_MESSAGE);
-            }
+            if (PacketSnapshots.PACKET_PLUGIN_MESSAGE != null)
+                writePacket(PacketSnapshots.PACKET_PLUGIN_MESSAGE);
 
-            if (PacketSnapshots.PACKET_BOSS_BAR != null && clientVersion.moreOrEqual(Version.V1_9))
+            if (PacketSnapshots.PACKET_BOSS_BAR != null)
                 writePacket(PacketSnapshots.PACKET_BOSS_BAR);
 
             if (PacketSnapshots.PACKET_JOIN_MESSAGE != null)
                 writePacket(PacketSnapshots.PACKET_JOIN_MESSAGE);
 
-            if (PacketSnapshots.PACKET_TITLE_TITLE != null && clientVersion.moreOrEqual(Version.V1_8))
+            if (PacketSnapshots.PACKET_TITLE_TITLE != null)
                 writeTitle();
 
-            if (PacketSnapshots.PACKET_HEADER_AND_FOOTER != null && clientVersion.moreOrEqual(Version.V1_8))
+            if (PacketSnapshots.PACKET_HEADER_AND_FOOTER != null)
                 writePacket(PacketSnapshots.PACKET_HEADER_AND_FOOTER);
 
-            if (clientVersion.moreOrEqual(Version.V1_20_3)) {
-                writePacket(PacketSnapshots.PACKET_START_WAITING_CHUNKS);
+            writePacket(PacketSnapshots.PACKET_START_WAITING_CHUNKS);
 
-                writePackets(PacketSnapshots.PACKETS_EMPTY_CHUNKS);
-            }
+            writePackets(PacketSnapshots.PACKETS_EMPTY_CHUNKS);
 
             sendKeepAlive();
         };
 
-        if (clientVersion.lessOrEqual(Version.V1_7_6)) {
-            this.channel.eventLoop().schedule(sendPlayPackets, 100, TimeUnit.MILLISECONDS);
-        } else {
-            sendPlayPackets.run();
-        }
+        sendPlayPackets.run();
     }
 
     public void onLoginAcknowledgedReceived() {
@@ -199,35 +178,14 @@ public class ClientConnection extends ChannelInboundHandlerAdapter {
         if (PacketSnapshots.PACKET_PLUGIN_MESSAGE != null)
             writePacket(PacketSnapshots.PACKET_PLUGIN_MESSAGE);
 
-        if (clientVersion.moreOrEqual(Version.V1_20_5)) {
-            writePacket(PacketSnapshots.PACKET_KNOWN_PACKS);
-
-            if (clientVersion.moreOrEqual(Version.V1_21_5)) {
-                writePackets(PacketSnapshots.PACKETS_REGISTRY_DATA_1_21_5);
-            } else if (clientVersion.moreOrEqual(Version.V1_21_4)) {
-                writePackets(PacketSnapshots.PACKETS_REGISTRY_DATA_1_21_4);
-            } else if (clientVersion.moreOrEqual(Version.V1_21_2)) {
-                writePackets(PacketSnapshots.PACKETS_REGISTRY_DATA_1_21_2);
-            } else if (clientVersion.moreOrEqual(Version.V1_21)) {
-                writePackets(PacketSnapshots.PACKETS_REGISTRY_DATA_1_21);
-            } else if (clientVersion.moreOrEqual(Version.V1_20_5)) {
-                writePackets(PacketSnapshots.PACKETS_REGISTRY_DATA_1_20_5);
-            }
-
-            if (clientVersion.moreOrEqual(Version.V1_21_5)) {
-                writePacket(PacketSnapshots.PACKET_UPDATE_TAGS_1_21_5);
-            } else {
-                writePacket(PacketSnapshots.PACKET_UPDATE_TAGS_1_20_5);
-            }
-        } else {
-            writePacket(PacketSnapshots.PACKET_REGISTRY_DATA);
-        }
-
+        writePacket(PacketSnapshots.PACKET_KNOWN_PACKS);
+        writePackets(PacketSnapshots.PACKETS_REGISTRY_DATA_1_21_5);
+        writePacket(PacketSnapshots.PACKET_UPDATE_TAGS_1_21_5);
         sendPacket(PacketSnapshots.PACKET_FINISH_CONFIGURATION);
     }
 
-    private void writePackets(List<PacketSnapshot> packets) {
-        for (PacketSnapshot packet : packets) {
+    private void writePackets(List<PacketOut> packets) {
+        for (PacketOut packet : packets) {
             writePacket(packet);
         }
     }
@@ -241,15 +199,9 @@ public class ClientConnection extends ChannelInboundHandlerAdapter {
     }
 
     public void writeTitle() {
-        if (clientVersion.moreOrEqual(Version.V1_17)) {
-            writePacket(PacketSnapshots.PACKET_TITLE_TITLE);
-            writePacket(PacketSnapshots.PACKET_TITLE_SUBTITLE);
-            writePacket(PacketSnapshots.PACKET_TITLE_TIMES);
-        } else {
-            writePacket(PacketSnapshots.PACKET_TITLE_LEGACY_TITLE);
-            writePacket(PacketSnapshots.PACKET_TITLE_LEGACY_SUBTITLE);
-            writePacket(PacketSnapshots.PACKET_TITLE_LEGACY_TIMES);
-        }
+        writePacket(PacketSnapshots.PACKET_TITLE_TITLE);
+        writePacket(PacketSnapshots.PACKET_TITLE_SUBTITLE);
+        writePacket(PacketSnapshots.PACKET_TITLE_TIMES);
     }
 
     public void sendKeepAlive() {
@@ -289,10 +241,8 @@ public class ClientConnection extends ChannelInboundHandlerAdapter {
         encoder.updateState(state);
     }
 
-    public void updateVersion(Version version) {
-        clientVersion = version;
-        decoder.updateVersion(version);
-        encoder.updateVersion(version);
+    public void updateProtocolVersion(int protocolVersion) {
+        this.protocolVersion = protocolVersion;
     }
 
     public void setAddress(String host) {

@@ -19,7 +19,6 @@ package ua.nanit.limbo.protocol.packets.play;
 
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketOut;
-import ua.nanit.limbo.protocol.registry.Version;
 
 public class PacketPlayerPositionAndLook implements PacketOut {
 
@@ -43,38 +42,7 @@ public class PacketPlayerPositionAndLook implements PacketOut {
     }
 
     @Override
-    public void encode(ByteMessage msg, Version version) {
-        if (version.moreOrEqual(Version.V1_21_2)) {
-            encodeModern(msg, version);
-            return;
-        }
-
-        encodeLegacy(msg, version);
-    }
-
-    private void encodeLegacy(ByteMessage msg, Version version) {
-        msg.writeDouble(x);
-        msg.writeDouble(y + (version.less(Version.V1_8) ? 1.62F : 0));
-        msg.writeDouble(z);
-        msg.writeFloat(yaw);
-        msg.writeFloat(pitch);
-
-        if (version.moreOrEqual(Version.V1_8)) {
-            msg.writeByte(0x08);
-        } else {
-            msg.writeBoolean(true);
-        }
-
-        if (version.moreOrEqual(Version.V1_9)) {
-            msg.writeVarInt(teleportId);
-        }
-
-        if (version.fromTo(Version.V1_17, Version.V1_19_3)) {
-            msg.writeBoolean(false); // Dismount vehicle
-        }
-    }
-
-    private void encodeModern(ByteMessage msg, Version version) {
+    public void encode(ByteMessage msg) {
         msg.writeVarInt(teleportId);
 
         msg.writeDouble(x);

@@ -44,7 +44,7 @@ public final class Connections {
     public void addConnection(ClientConnection connection) {
         connections.put(connection.getUuid(), connection);
         Log.info("Player %s connected (%s) [%s]", connection.getUsername(),
-                connection.getAddress(), connection.getClientVersion());
+                connection.getAddress(), connection.getProtocolVersion());
     }
 
     public void removeConnection(ClientConnection connection) {

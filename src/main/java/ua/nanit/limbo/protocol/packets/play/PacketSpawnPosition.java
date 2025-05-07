@@ -2,7 +2,6 @@ package ua.nanit.limbo.protocol.packets.play;
 
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketOut;
-import ua.nanit.limbo.protocol.registry.Version;
 
 public class PacketSpawnPosition implements PacketOut {
 
@@ -19,7 +18,7 @@ public class PacketSpawnPosition implements PacketOut {
     }
 
     @Override
-    public void encode(ByteMessage msg, Version version) {
+    public void encode(ByteMessage msg) {
         msg.writeLong(encodePosition(x, y ,z));
         msg.writeFloat(0);
     }

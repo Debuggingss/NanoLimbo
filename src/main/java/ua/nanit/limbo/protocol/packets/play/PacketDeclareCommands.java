@@ -19,7 +19,6 @@ package ua.nanit.limbo.protocol.packets.play;
 
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketOut;
-import ua.nanit.limbo.protocol.registry.Version;
 
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class PacketDeclareCommands implements PacketOut {
     }
 
     @Override
-    public void encode(ByteMessage msg, Version version) {
+    public void encode(ByteMessage msg) {
         msg.writeVarInt(commands.size() * 2 + 1); // +1 because declaring root node
 
         // Declare root node

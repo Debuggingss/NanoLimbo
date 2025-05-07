@@ -21,7 +21,7 @@ import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
 import ua.nanit.limbo.LimboConstants;
-import ua.nanit.limbo.protocol.PacketSnapshot;
+import ua.nanit.limbo.protocol.PacketOut;
 import ua.nanit.limbo.protocol.packets.configuration.PacketFinishConfiguration;
 import ua.nanit.limbo.protocol.packets.configuration.PacketKnownPacks;
 import ua.nanit.limbo.protocol.packets.configuration.PacketRegistryData;
@@ -38,46 +38,36 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public final class PacketSnapshots {
 
-    public static PacketSnapshot PACKET_LOGIN_SUCCESS;
-    public static PacketSnapshot PACKET_JOIN_GAME;
-    public static PacketSnapshot PACKET_SPAWN_POSITION;
-    public static PacketSnapshot PACKET_PLUGIN_MESSAGE;
-    public static PacketSnapshot PACKET_PLAYER_ABILITIES;
-    public static PacketSnapshot PACKET_PLAYER_INFO;
-    public static PacketSnapshot PACKET_DECLARE_COMMANDS;
-    public static PacketSnapshot PACKET_JOIN_MESSAGE;
-    public static PacketSnapshot PACKET_BOSS_BAR;
-    public static PacketSnapshot PACKET_HEADER_AND_FOOTER;
+    public static PacketOut PACKET_LOGIN_SUCCESS;
+    public static PacketOut PACKET_JOIN_GAME;
+    public static PacketOut PACKET_SPAWN_POSITION;
+    public static PacketOut PACKET_PLUGIN_MESSAGE;
+    public static PacketOut PACKET_PLAYER_ABILITIES;
+    public static PacketOut PACKET_PLAYER_INFO;
+    public static PacketOut PACKET_DECLARE_COMMANDS;
+    public static PacketOut PACKET_JOIN_MESSAGE;
+    public static PacketOut PACKET_BOSS_BAR;
+    public static PacketOut PACKET_HEADER_AND_FOOTER;
 
-    public static PacketSnapshot PACKET_PLAYER_POS_AND_LOOK_LEGACY;
     // For 1.19 we need to spawn player outside the world to avoid stuck in terrain loading
-    public static PacketSnapshot PACKET_PLAYER_POS_AND_LOOK;
+    public static PacketOut PACKET_PLAYER_POS_AND_LOOK;
 
-    public static PacketSnapshot PACKET_TITLE_TITLE;
-    public static PacketSnapshot PACKET_TITLE_SUBTITLE;
-    public static PacketSnapshot PACKET_TITLE_TIMES;
+    public static PacketOut PACKET_TITLE_TITLE;
+    public static PacketOut PACKET_TITLE_SUBTITLE;
+    public static PacketOut PACKET_TITLE_TIMES;
 
-    public static PacketSnapshot PACKET_TITLE_LEGACY_TITLE;
-    public static PacketSnapshot PACKET_TITLE_LEGACY_SUBTITLE;
-    public static PacketSnapshot PACKET_TITLE_LEGACY_TIMES;
+    public static PacketOut PACKET_REGISTRY_DATA;
 
-    public static PacketSnapshot PACKET_REGISTRY_DATA;
+    public static PacketOut PACKET_KNOWN_PACKS;
 
-    public static PacketSnapshot PACKET_KNOWN_PACKS;
+    public static PacketOut PACKET_UPDATE_TAGS_1_21_5;
 
-    public static PacketSnapshot PACKET_UPDATE_TAGS_1_20_5;
-    public static PacketSnapshot PACKET_UPDATE_TAGS_1_21_5;
+    public static List<PacketOut> PACKETS_REGISTRY_DATA_1_21_5;
 
-    public static List<PacketSnapshot> PACKETS_REGISTRY_DATA_1_20_5;
-    public static List<PacketSnapshot> PACKETS_REGISTRY_DATA_1_21;
-    public static List<PacketSnapshot> PACKETS_REGISTRY_DATA_1_21_2;
-    public static List<PacketSnapshot> PACKETS_REGISTRY_DATA_1_21_4;
-    public static List<PacketSnapshot> PACKETS_REGISTRY_DATA_1_21_5;
+    public static PacketOut PACKET_FINISH_CONFIGURATION;
 
-    public static PacketSnapshot PACKET_FINISH_CONFIGURATION;
-
-    public static List<PacketSnapshot> PACKETS_EMPTY_CHUNKS;
-    public static PacketSnapshot PACKET_START_WAITING_CHUNKS;
+    public static List<PacketOut> PACKETS_EMPTY_CHUNKS;
+    public static PacketOut PACKET_START_WAITING_CHUNKS;
 
     private PacketSnapshots() {
     }
@@ -114,9 +104,6 @@ public final class PacketSnapshots {
 
         int teleportId = ThreadLocalRandom.current().nextInt();
 
-        PacketPlayerPositionAndLook positionAndLookLegacy
-                = new PacketPlayerPositionAndLook(0, 64, 0, 0, 0, teleportId);
-
         PacketPlayerPositionAndLook positionAndLook
                 = new PacketPlayerPositionAndLook(0, 400, 0, 0, 0, teleportId);
 
@@ -130,43 +117,41 @@ public final class PacketSnapshots {
         info.setGameMode(server.getConfig().getGameMode());
         info.setUuid(uuid);
 
-        PACKET_LOGIN_SUCCESS = PacketSnapshot.of(loginSuccess);
-        PACKET_JOIN_GAME = PacketSnapshot.of(joinGame);
-        PACKET_PLAYER_POS_AND_LOOK_LEGACY = PacketSnapshot.of(positionAndLookLegacy);
-        PACKET_PLAYER_POS_AND_LOOK = PacketSnapshot.of(positionAndLook);
-        PACKET_SPAWN_POSITION = PacketSnapshot.of(packetSpawnPosition);
-        PACKET_PLAYER_ABILITIES = PacketSnapshot.of(playerAbilities);
-        PACKET_PLAYER_INFO = PacketSnapshot.of(info);
+        PACKET_LOGIN_SUCCESS = loginSuccess;
+        PACKET_JOIN_GAME = joinGame;
+        PACKET_PLAYER_POS_AND_LOOK = positionAndLook;
+        PACKET_SPAWN_POSITION = packetSpawnPosition;
+        PACKET_PLAYER_ABILITIES = playerAbilities;
+        PACKET_PLAYER_INFO = info;
 
-        PACKET_DECLARE_COMMANDS = PacketSnapshot.of(declareCommands);
+        PACKET_DECLARE_COMMANDS = declareCommands;
 
         if (server.getConfig().isUseHeaderAndFooter()) {
             PacketPlayerListHeader header = new PacketPlayerListHeader();
             header.setHeader(NbtMessageUtil.create(server.getConfig().getPlayerListHeader()));
             header.setFooter(NbtMessageUtil.create(server.getConfig().getPlayerListFooter()));
-            PACKET_HEADER_AND_FOOTER = PacketSnapshot.of(header);
+            PACKET_HEADER_AND_FOOTER = header;
         }
 
         if (server.getConfig().isUseBrandName()) {
             PacketPluginMessage pluginMessage = new PacketPluginMessage();
             pluginMessage.setChannel(LimboConstants.BRAND_CHANNEL);
             pluginMessage.setMessage(server.getConfig().getBrandName());
-            PACKET_PLUGIN_MESSAGE = PacketSnapshot.of(pluginMessage);
+            PACKET_PLUGIN_MESSAGE = pluginMessage;
         }
 
         if (server.getConfig().isUseJoinMessage()) {
             PacketChatMessage joinMessage = new PacketChatMessage();
             joinMessage.setMessage(NbtMessageUtil.create(server.getConfig().getJoinMessage()));
             joinMessage.setPosition(PacketChatMessage.PositionLegacy.SYSTEM_MESSAGE);
-            joinMessage.setSender(UUID.randomUUID());
-            PACKET_JOIN_MESSAGE = PacketSnapshot.of(joinMessage);
+            PACKET_JOIN_MESSAGE = joinMessage;
         }
 
         if (server.getConfig().isUseBossBar()) {
             PacketBossBar bossBar = new PacketBossBar();
             bossBar.setBossBar(server.getConfig().getBossBar());
             bossBar.setUuid(UUID.randomUUID());
-            PACKET_BOSS_BAR = PacketSnapshot.of(bossBar);
+            PACKET_BOSS_BAR = bossBar;
         }
 
         if (server.getConfig().isUseTitle()) {
@@ -176,63 +161,41 @@ public final class PacketSnapshots {
             PacketTitleSetSubTitle packetSubtitle = new PacketTitleSetSubTitle();
             PacketTitleTimes packetTimes = new PacketTitleTimes();
 
-            PacketTitleLegacy legacyTitle = new PacketTitleLegacy();
-            PacketTitleLegacy legacySubtitle = new PacketTitleLegacy();
-            PacketTitleLegacy legacyTimes = new PacketTitleLegacy();
-
             packetTitle.setTitle(title.getTitle());
             packetSubtitle.setSubtitle(title.getSubtitle());
             packetTimes.setFadeIn(title.getFadeIn());
             packetTimes.setStay(title.getStay());
             packetTimes.setFadeOut(title.getFadeOut());
 
-            legacyTitle.setTitle(title);
-            legacyTitle.setAction(PacketTitleLegacy.Action.SET_TITLE);
-
-            legacySubtitle.setTitle(title);
-            legacySubtitle.setAction(PacketTitleLegacy.Action.SET_SUBTITLE);
-
-            legacyTimes.setTitle(title);
-            legacyTimes.setAction(PacketTitleLegacy.Action.SET_TIMES_AND_DISPLAY);
-
-            PACKET_TITLE_TITLE = PacketSnapshot.of(packetTitle);
-            PACKET_TITLE_SUBTITLE = PacketSnapshot.of(packetSubtitle);
-            PACKET_TITLE_TIMES = PacketSnapshot.of(packetTimes);
-
-            PACKET_TITLE_LEGACY_TITLE = PacketSnapshot.of(legacyTitle);
-            PACKET_TITLE_LEGACY_SUBTITLE = PacketSnapshot.of(legacySubtitle);
-            PACKET_TITLE_LEGACY_TIMES = PacketSnapshot.of(legacyTimes);
+            PACKET_TITLE_TITLE = packetTitle;
+            PACKET_TITLE_SUBTITLE = packetSubtitle;
+            PACKET_TITLE_TIMES = packetTimes;
         }
 
         PacketKnownPacks packetKnownPacks = new PacketKnownPacks();
-        PACKET_KNOWN_PACKS = PacketSnapshot.of(packetKnownPacks);
+        PACKET_KNOWN_PACKS = packetKnownPacks;
 
-        PACKET_UPDATE_TAGS_1_20_5 = createTagData(server.getDimensionRegistry().getTags_1_20_5());
         PACKET_UPDATE_TAGS_1_21_5 = createTagData(server.getDimensionRegistry().getTags_1_21_5());
 
         PacketRegistryData packetRegistryData = new PacketRegistryData();
         packetRegistryData.setDimensionRegistry(server.getDimensionRegistry());
 
-        PACKET_REGISTRY_DATA = PacketSnapshot.of(packetRegistryData);
+        PACKET_REGISTRY_DATA = packetRegistryData;
 
-        PACKETS_REGISTRY_DATA_1_20_5 = createRegistryData(server, server.getDimensionRegistry().getCodec_1_20_5());
-        PACKETS_REGISTRY_DATA_1_21 = createRegistryData(server, server.getDimensionRegistry().getCodec_1_21());
-        PACKETS_REGISTRY_DATA_1_21_2 = createRegistryData(server, server.getDimensionRegistry().getCodec_1_21_2());
-        PACKETS_REGISTRY_DATA_1_21_4 = createRegistryData(server, server.getDimensionRegistry().getCodec_1_21_4());
         PACKETS_REGISTRY_DATA_1_21_5 = createRegistryData(server, server.getDimensionRegistry().getCodec_1_21_5());
 
-        PACKET_FINISH_CONFIGURATION = PacketSnapshot.of(new PacketFinishConfiguration());
+        PACKET_FINISH_CONFIGURATION = new PacketFinishConfiguration();
 
         PacketGameEvent packetGameEvent = new PacketGameEvent();
         packetGameEvent.setType((byte) 13); // Waiting for chunks type
         packetGameEvent.setValue(0);
-        PACKET_START_WAITING_CHUNKS = PacketSnapshot.of(packetGameEvent);
+        PACKET_START_WAITING_CHUNKS = packetGameEvent;
 
         int chunkXOffset = (int) 0 >> 4; // Default x position is 0
         int chunkZOffset = (int) 0 >> 4; // Default z position is 0
         int chunkEdgeSize = 1; // TODO Make configurable?
 
-        List<PacketSnapshot> emptyChunks = new ArrayList<>();
+        List<PacketOut> emptyChunks = new ArrayList<>();
         // Make multiple chunks for edges
         for (int chunkX = chunkXOffset - chunkEdgeSize; chunkX <= chunkXOffset + chunkEdgeSize; ++chunkX) {
             for (int chunkZ = chunkZOffset - chunkEdgeSize; chunkZ <= chunkZOffset + chunkEdgeSize; ++chunkZ) {
@@ -240,21 +203,20 @@ public final class PacketSnapshots {
                 packetEmptyChunk.setX(chunkX);
                 packetEmptyChunk.setZ(chunkZ);
 
-                emptyChunks.add(PacketSnapshot.of(packetEmptyChunk));
+                emptyChunks.add(packetEmptyChunk);
             }
         }
         PACKETS_EMPTY_CHUNKS = emptyChunks;
     }
 
-    private static PacketSnapshot createTagData(CompoundBinaryTag tags) {
+    private static PacketOut createTagData(CompoundBinaryTag tags) {
         PacketUpdateTags packetUpdateTags = new PacketUpdateTags();
         packetUpdateTags.setTags(tags);
-
-        return PacketSnapshot.of(packetUpdateTags);
+        return packetUpdateTags;
     }
 
-    private static List<PacketSnapshot> createRegistryData(LimboServer server, CompoundBinaryTag dimensionTag) {
-        List<PacketSnapshot> packetRegistries = new ArrayList<>();
+    private static List<PacketOut> createRegistryData(LimboServer server, CompoundBinaryTag dimensionTag) {
+        List<PacketOut> packetRegistries = new ArrayList<>();
         for (String registryType : dimensionTag.keySet()) {
             CompoundBinaryTag compoundRegistryType = dimensionTag.getCompound(registryType);
 
@@ -262,7 +224,7 @@ public final class PacketSnapshots {
             registryData.setDimensionRegistry(server.getDimensionRegistry());
 
             ListBinaryTag values = compoundRegistryType.getList("value");
-            registryData.setMetadataWriter((message, version) -> {
+            registryData.setMetadataWriter(message -> {
                 message.writeString(registryType);
 
                 message.writeVarInt(values.size());
@@ -282,7 +244,7 @@ public final class PacketSnapshots {
                 }
             });
 
-            packetRegistries.add(PacketSnapshot.of(registryData));
+            packetRegistries.add(registryData);
         }
 
         return packetRegistries;

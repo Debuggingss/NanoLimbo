@@ -19,7 +19,6 @@ package ua.nanit.limbo.protocol.packets.play;
 
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketOut;
-import ua.nanit.limbo.protocol.registry.Version;
 
 public class PacketTitleTimes implements PacketOut {
 
@@ -40,7 +39,7 @@ public class PacketTitleTimes implements PacketOut {
     }
 
     @Override
-    public void encode(ByteMessage msg, Version version) {
+    public void encode(ByteMessage msg) {
         msg.writeInt(fadeIn);
         msg.writeInt(stay);
         msg.writeInt(fadeOut);
