@@ -47,14 +47,6 @@ public class ClientChannelInitializer extends ChannelInitializer<Channel> {
         pipeline.addLast("frame_decoder", new VarIntFrameDecoder());
         pipeline.addLast("frame_encoder", new VarIntLengthEncoder());
 
-        if (server.getConfig().isUseTrafficLimits()) {
-            pipeline.addLast("traffic_limit", new ChannelTrafficHandler(
-                    server.getConfig().getMaxPacketSize(),
-                    server.getConfig().getInterval(),
-                    server.getConfig().getMaxPacketRate()
-            ));
-        }
-
         pipeline.addLast("decoder", decoder);
         pipeline.addLast("encoder", encoder);
         pipeline.addLast("handler", connection);

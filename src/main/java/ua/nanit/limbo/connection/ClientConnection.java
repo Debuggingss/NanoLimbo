@@ -47,7 +47,6 @@ import java.security.MessageDigest;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 
 public class ClientConnection extends ChannelInboundHandlerAdapter {
 
@@ -142,25 +141,10 @@ public class ClientConnection extends ChannelInboundHandlerAdapter {
             writePacket(PacketSnapshots.PACKET_PLAYER_POS_AND_LOOK);
             writePacket(PacketSnapshots.PACKET_SPAWN_POSITION);
 
-            if (server.getConfig().isUsePlayerList())
-                writePacket(PacketSnapshots.PACKET_PLAYER_INFO);
-
             writePacket(PacketSnapshots.PACKET_DECLARE_COMMANDS);
 
             if (PacketSnapshots.PACKET_PLUGIN_MESSAGE != null)
                 writePacket(PacketSnapshots.PACKET_PLUGIN_MESSAGE);
-
-            if (PacketSnapshots.PACKET_BOSS_BAR != null)
-                writePacket(PacketSnapshots.PACKET_BOSS_BAR);
-
-            if (PacketSnapshots.PACKET_JOIN_MESSAGE != null)
-                writePacket(PacketSnapshots.PACKET_JOIN_MESSAGE);
-
-            if (PacketSnapshots.PACKET_TITLE_TITLE != null)
-                writeTitle();
-
-            if (PacketSnapshots.PACKET_HEADER_AND_FOOTER != null)
-                writePacket(PacketSnapshots.PACKET_HEADER_AND_FOOTER);
 
             writePacket(PacketSnapshots.PACKET_START_WAITING_CHUNKS);
 
@@ -196,12 +180,6 @@ public class ClientConnection extends ChannelInboundHandlerAdapter {
             disconnect.setReason(reason);
             sendPacketAndClose(disconnect);
         }
-    }
-
-    public void writeTitle() {
-        writePacket(PacketSnapshots.PACKET_TITLE_TITLE);
-        writePacket(PacketSnapshots.PACKET_TITLE_SUBTITLE);
-        writePacket(PacketSnapshots.PACKET_TITLE_TIMES);
     }
 
     public void sendKeepAlive() {

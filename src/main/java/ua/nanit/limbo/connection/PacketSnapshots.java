@@ -20,7 +20,6 @@ package ua.nanit.limbo.connection;
 import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.ListBinaryTag;
-import ua.nanit.limbo.LimboConstants;
 import ua.nanit.limbo.protocol.PacketOut;
 import ua.nanit.limbo.protocol.packets.configuration.PacketFinishConfiguration;
 import ua.nanit.limbo.protocol.packets.configuration.PacketKnownPacks;
@@ -29,8 +28,6 @@ import ua.nanit.limbo.protocol.packets.configuration.PacketUpdateTags;
 import ua.nanit.limbo.protocol.packets.login.PacketLoginSuccess;
 import ua.nanit.limbo.protocol.packets.play.*;
 import ua.nanit.limbo.server.LimboServer;
-import ua.nanit.limbo.server.data.Title;
-import ua.nanit.limbo.util.NbtMessageUtil;
 import ua.nanit.limbo.util.UuidUtil;
 
 import java.util.*;
@@ -45,16 +42,9 @@ public final class PacketSnapshots {
     public static PacketOut PACKET_PLAYER_ABILITIES;
     public static PacketOut PACKET_PLAYER_INFO;
     public static PacketOut PACKET_DECLARE_COMMANDS;
-    public static PacketOut PACKET_JOIN_MESSAGE;
-    public static PacketOut PACKET_BOSS_BAR;
-    public static PacketOut PACKET_HEADER_AND_FOOTER;
 
     // For 1.19 we need to spawn player outside the world to avoid stuck in terrain loading
     public static PacketOut PACKET_PLAYER_POS_AND_LOOK;
-
-    public static PacketOut PACKET_TITLE_TITLE;
-    public static PacketOut PACKET_TITLE_SUBTITLE;
-    public static PacketOut PACKET_TITLE_TIMES;
 
     public static PacketOut PACKET_REGISTRY_DATA;
 
@@ -113,7 +103,6 @@ public final class PacketSnapshots {
         declareCommands.setCommands(Collections.emptyList());
 
         PacketPlayerInfo info = new PacketPlayerInfo();
-        info.setUsername(server.getConfig().getPlayerListUsername());
         info.setGameMode(server.getConfig().getGameMode());
         info.setUuid(uuid);
 
@@ -125,52 +114,6 @@ public final class PacketSnapshots {
         PACKET_PLAYER_INFO = info;
 
         PACKET_DECLARE_COMMANDS = declareCommands;
-
-        if (server.getConfig().isUseHeaderAndFooter()) {
-            PacketPlayerListHeader header = new PacketPlayerListHeader();
-            header.setHeader(NbtMessageUtil.create(server.getConfig().getPlayerListHeader()));
-            header.setFooter(NbtMessageUtil.create(server.getConfig().getPlayerListFooter()));
-            PACKET_HEADER_AND_FOOTER = header;
-        }
-
-        if (server.getConfig().isUseBrandName()) {
-            PacketPluginMessage pluginMessage = new PacketPluginMessage();
-            pluginMessage.setChannel(LimboConstants.BRAND_CHANNEL);
-            pluginMessage.setMessage(server.getConfig().getBrandName());
-            PACKET_PLUGIN_MESSAGE = pluginMessage;
-        }
-
-        if (server.getConfig().isUseJoinMessage()) {
-            PacketChatMessage joinMessage = new PacketChatMessage();
-            joinMessage.setMessage(NbtMessageUtil.create(server.getConfig().getJoinMessage()));
-            joinMessage.setPosition(PacketChatMessage.PositionLegacy.SYSTEM_MESSAGE);
-            PACKET_JOIN_MESSAGE = joinMessage;
-        }
-
-        if (server.getConfig().isUseBossBar()) {
-            PacketBossBar bossBar = new PacketBossBar();
-            bossBar.setBossBar(server.getConfig().getBossBar());
-            bossBar.setUuid(UUID.randomUUID());
-            PACKET_BOSS_BAR = bossBar;
-        }
-
-        if (server.getConfig().isUseTitle()) {
-            Title title = server.getConfig().getTitle();
-
-            PacketTitleSetTitle packetTitle = new PacketTitleSetTitle();
-            PacketTitleSetSubTitle packetSubtitle = new PacketTitleSetSubTitle();
-            PacketTitleTimes packetTimes = new PacketTitleTimes();
-
-            packetTitle.setTitle(title.getTitle());
-            packetSubtitle.setSubtitle(title.getSubtitle());
-            packetTimes.setFadeIn(title.getFadeIn());
-            packetTimes.setStay(title.getStay());
-            packetTimes.setFadeOut(title.getFadeOut());
-
-            PACKET_TITLE_TITLE = packetTitle;
-            PACKET_TITLE_SUBTITLE = packetSubtitle;
-            PACKET_TITLE_TIMES = packetTimes;
-        }
 
         PacketKnownPacks packetKnownPacks = new PacketKnownPacks();
         PACKET_KNOWN_PACKS = packetKnownPacks;

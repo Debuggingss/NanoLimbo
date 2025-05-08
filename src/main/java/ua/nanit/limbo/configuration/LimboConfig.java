@@ -21,7 +21,6 @@ import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.ConfigurationOptions;
 import org.spongepowered.configurate.serialize.TypeSerializerCollection;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
-import ua.nanit.limbo.util.Colors;
 import ua.nanit.limbo.server.data.BossBar;
 import ua.nanit.limbo.server.data.InfoForwarding;
 import ua.nanit.limbo.server.data.PingData;
@@ -47,22 +46,6 @@ public final class LimboConfig {
     private String dimensionType;
     private int gameMode;
 
-    private boolean useBrandName;
-    private boolean useJoinMessage;
-    private boolean useBossBar;
-    private boolean useTitle;
-    private boolean usePlayerList;
-    private boolean useHeaderAndFooter;
-
-    private String brandName;
-    private String joinMessage;
-    private BossBar bossBar;
-    private Title title;
-
-    private String playerListUsername;
-    private String playerListHeader;
-    private String playerListFooter;
-
     private InfoForwarding infoForwarding;
     private long readTimeout;
     private int debugLevel;
@@ -70,11 +53,6 @@ public final class LimboConfig {
     private boolean useEpoll;
     private int bossGroupSize;
     private int workerGroupSize;
-
-    private boolean useTrafficLimits;
-    private int maxPacketSize;
-    private double interval;
-    private double maxPacketRate;
 
     public LimboConfig(Path root) {
         this.root = root;
@@ -100,30 +78,6 @@ public final class LimboConfig {
             dimensionType = "the_end";
         }
         gameMode = conf.node("gameMode").getInt();
-        useBrandName = conf.node("brandName", "enable").getBoolean();
-        useJoinMessage = conf.node("joinMessage", "enable").getBoolean();
-        useBossBar = conf.node("bossBar", "enable").getBoolean();
-        useTitle = conf.node("title", "enable").getBoolean();
-        usePlayerList = conf.node("playerList", "enable").getBoolean();
-        playerListUsername = conf.node("playerList", "username").getString();
-        useHeaderAndFooter = conf.node("headerAndFooter", "enable").getBoolean();
-
-        if (useBrandName)
-            brandName = conf.node("brandName", "content").getString();
-
-        if (useJoinMessage)
-            joinMessage = Colors.of(conf.node("joinMessage", "text").getString(""));
-
-        if (useBossBar)
-            bossBar = conf.node("bossBar").get(BossBar.class);
-
-        if (useTitle)
-            title = conf.node("title").get(Title.class);
-
-        if (useHeaderAndFooter) {
-            playerListHeader = Colors.of(conf.node("headerAndFooter", "header").getString());
-            playerListFooter = Colors.of(conf.node("headerAndFooter", "footer").getString());
-        }
 
         infoForwarding = conf.node("infoForwarding").get(InfoForwarding.class);
         readTimeout = conf.node("readTimeout").getLong();
@@ -132,11 +86,6 @@ public final class LimboConfig {
         useEpoll = conf.node("netty", "useEpoll").getBoolean(true);
         bossGroupSize = conf.node("netty", "threads", "bossGroup").getInt(1);
         workerGroupSize = conf.node("netty", "threads", "workerGroup").getInt(4);
-
-        useTrafficLimits = conf.node("traffic", "enable").getBoolean(false);
-        maxPacketSize = conf.node("traffic", "maxPacketSize").getInt(-1);
-        interval = conf.node("traffic", "interval").getDouble(-1.0);
-        maxPacketRate = conf.node("traffic", "maxPacketRate").getDouble(-1.0);
     }
 
     private BufferedReader getReader() throws IOException {
@@ -197,58 +146,6 @@ public final class LimboConfig {
         return debugLevel;
     }
 
-    public boolean isUseBrandName() {
-        return useBrandName;
-    }
-
-    public boolean isUseJoinMessage() {
-        return useJoinMessage;
-    }
-
-    public boolean isUseBossBar() {
-        return useBossBar;
-    }
-
-    public boolean isUseTitle() {
-        return useTitle;
-    }
-
-    public boolean isUsePlayerList() {
-        return usePlayerList;
-    }
-
-    public boolean isUseHeaderAndFooter() {
-        return useHeaderAndFooter;
-    }
-
-    public String getBrandName() {
-        return brandName;
-    }
-
-    public String getJoinMessage() {
-        return joinMessage;
-    }
-
-    public BossBar getBossBar() {
-        return bossBar;
-    }
-
-    public Title getTitle() {
-        return title;
-    }
-
-    public String getPlayerListUsername() {
-        return playerListUsername;
-    }
-
-    public String getPlayerListHeader() {
-        return playerListHeader;
-    }
-
-    public String getPlayerListFooter() {
-        return playerListFooter;
-    }
-
     public boolean isUseEpoll() {
         return useEpoll;
     }
@@ -259,21 +156,5 @@ public final class LimboConfig {
 
     public int getWorkerGroupSize() {
         return workerGroupSize;
-    }
-
-    public boolean isUseTrafficLimits() {
-        return useTrafficLimits;
-    }
-
-    public int getMaxPacketSize() {
-        return maxPacketSize;
-    }
-
-    public double getInterval() {
-        return interval;
-    }
-
-    public double getMaxPacketRate() {
-        return maxPacketRate;
     }
 }

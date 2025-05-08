@@ -28,7 +28,6 @@ public class PingData {
 
     private String version;
     private String description;
-    private int protocol;
 
     public String getVersion() {
         return version;
@@ -46,14 +45,6 @@ public class PingData {
         this.description = description;
     }
 
-    public int getProtocol() {
-        return protocol;
-    }
-
-    public void setProtocol(int protocol) {
-        this.protocol = protocol;
-    }
-
     public static class Serializer implements TypeSerializer<PingData> {
 
         @Override
@@ -61,7 +52,6 @@ public class PingData {
             PingData pingData = new PingData();
             pingData.setDescription(Colors.of(node.node("description").getString("")));
             pingData.setVersion(Colors.of(node.node("version").getString("")));
-            pingData.setProtocol(node.node("protocol").getInt(-1));
             return pingData;
         }
 

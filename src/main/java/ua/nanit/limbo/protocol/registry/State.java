@@ -80,13 +80,7 @@ public enum State {
             clientBound.register(PacketPlayerAbilities::new, 0x39);
             clientBound.register(PacketPlayerPositionAndLook::new, 0x41);
             clientBound.register(PacketKeepAlive::new, 0x26);
-            clientBound.register(PacketChatMessage::new, 0x72);
-            clientBound.register(PacketBossBar::new, 0x09);
             clientBound.register(PacketPlayerInfo::new, 0x3F);
-            clientBound.register(PacketTitleSetTitle::new, 0x6B);
-            clientBound.register(PacketTitleSetSubTitle::new, 0x69);
-            clientBound.register(PacketTitleTimes::new, 0x6C);
-            clientBound.register(PacketPlayerListHeader::new, 0x73);
             clientBound.register(PacketSpawnPosition::new, 0x5A);
             clientBound.register(PacketGameEvent::new, 0x22);
             clientBound.register(PacketEmptyChunk::new, 0x27);
