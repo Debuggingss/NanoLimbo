@@ -10,6 +10,8 @@ import java.util.*;
 
 public class Litematic {
 
+    private Litematic() {}
+
     public static World toWorld(String name, boolean skyLight, CompoundTag litematicRoot) {
         CompoundTag regions = litematicRoot.getCompoundTag("Regions");
         World world = null;

@@ -19,6 +19,10 @@ ping:
 # Available dimensions: OVERWORLD, NETHER, THE_END
 dimension: THE_END
 
+# Supports .litematic and .schem
+# Leave empty for void
+schematic:
+
 # Setup player's game mode
 # 0 - Survival
 # 1 - Creative (hide HP and food bar)
@@ -26,6 +30,14 @@ dimension: THE_END
 # 3 - Spectator (hide all UI bars)
 # Spectator works on 1.8+ clients
 gameMode: 3
+
+# Player spawn position. x,y,z are doubles, yaw,pitch are floats
+spawnPos:
+  x: 0
+  y: 0
+  z: 0
+  yaw: 0
+  pitch: 0
 
 # Player info forwarding support.
 # Available types:

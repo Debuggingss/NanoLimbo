@@ -19,6 +19,7 @@ package ua.nanit.limbo.protocol.packets.play;
 
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketOut;
+import ua.nanit.limbo.util.Location;
 
 public class PacketPlayerPositionAndLook implements PacketOut {
 
@@ -29,8 +30,7 @@ public class PacketPlayerPositionAndLook implements PacketOut {
     private float pitch;
     private int teleportId;
 
-    public PacketPlayerPositionAndLook() {
-    }
+    public PacketPlayerPositionAndLook() {}
 
     public PacketPlayerPositionAndLook(double x, double y, double z, float yaw, float pitch, int teleportId) {
         this.x = x;
@@ -41,6 +41,10 @@ public class PacketPlayerPositionAndLook implements PacketOut {
         this.teleportId = teleportId;
     }
 
+    public PacketPlayerPositionAndLook(Location location, int teleportId) {
+        this(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch(), teleportId);
+    }
+
     @Override
     public void encode(ByteMessage msg) {
         msg.writeVarInt(teleportId);
@@ -49,6 +53,7 @@ public class PacketPlayerPositionAndLook implements PacketOut {
         msg.writeDouble(y);
         msg.writeDouble(z);
 
+        // velocity
         msg.writeDouble(0);
         msg.writeDouble(0);
         msg.writeDouble(0);
@@ -56,6 +61,7 @@ public class PacketPlayerPositionAndLook implements PacketOut {
         msg.writeFloat(yaw);
         msg.writeFloat(pitch);
 
+        // https://minecraft.wiki/w/Java_Edition_protocol/Data_types#Teleport_Flags
         msg.writeInt(0);
     }
 }

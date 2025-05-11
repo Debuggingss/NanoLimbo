@@ -27,13 +27,20 @@ import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.ResourceLeakDetector;
+import net.querz.nbt.io.NBTUtil;
+import net.querz.nbt.tag.CompoundTag;
 import ua.nanit.limbo.configuration.LimboConfig;
 import ua.nanit.limbo.connection.ClientChannelInitializer;
 import ua.nanit.limbo.connection.ClientConnection;
 import ua.nanit.limbo.connection.PacketHandler;
 import ua.nanit.limbo.connection.PacketSnapshots;
 import ua.nanit.limbo.world.DimensionRegistry;
+import ua.nanit.limbo.world.Litematic;
+import ua.nanit.limbo.world.Schematic;
+import ua.nanit.limbo.world.World;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.concurrent.ScheduledFuture;
@@ -51,6 +58,7 @@ public final class LimboServer {
     private EventLoopGroup workerGroup;
 
     private CommandManager commandManager;
+    private World world;
 
     public LimboConfig getConfig() {
         return config;
@@ -72,12 +80,36 @@ public final class LimboServer {
         return commandManager;
     }
 
+    public World getWorld() {
+        return world;
+    }
+
     public void start() throws Exception {
         config = new LimboConfig(Paths.get("./"));
         config.load();
 
         Log.setLevel(config.getDebugLevel());
         Log.info("Starting server...");
+
+        File schemFile = config.getSchematicFile();
+
+        if (schemFile != null) {
+            String schemFileName = schemFile.getName();
+            String extension = schemFileName.substring(schemFileName.lastIndexOf('.') + 1);
+
+            try {
+                if (extension.startsWith("schem")) {
+                    world = Schematic.toWorld("limbo", true, (CompoundTag) NBTUtil.read(schemFile).getTag());
+                } else if (extension.startsWith("lite")) {
+                    world = Litematic.toWorld("limbo", true, (CompoundTag) NBTUtil.read(schemFile).getTag());
+                } else {
+                    throw new IllegalArgumentException("Unrecognized schematic file type: " + extension);
+                }
+            } catch (IOException e) {
+                Log.error("Unable to load schematic file", e);
+                System.exit(1);
+            }
+        }
 
         ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.DISABLED);
 

@@ -21,15 +21,11 @@ import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.ConfigurationOptions;
 import org.spongepowered.configurate.serialize.TypeSerializerCollection;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
-import ua.nanit.limbo.server.data.BossBar;
 import ua.nanit.limbo.server.data.InfoForwarding;
 import ua.nanit.limbo.server.data.PingData;
-import ua.nanit.limbo.server.data.Title;
+import ua.nanit.limbo.util.Location;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.SocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,7 +40,9 @@ public final class LimboConfig {
     private PingData pingData;
 
     private String dimensionType;
+    private File schematicFile;
     private int gameMode;
+    private Location spawnPosition;
 
     private InfoForwarding infoForwarding;
     private long readTimeout;
@@ -70,6 +68,7 @@ public final class LimboConfig {
         address = conf.node("bind").get(SocketAddress.class);
         maxPlayers = conf.node("maxPlayers").getInt();
         pingData = conf.node("ping").get(PingData.class);
+
         dimensionType = conf.node("dimension").getString("the_end");
         if (dimensionType.equalsIgnoreCase("nether")) {
             dimensionType = "the_nether";
@@ -77,7 +76,20 @@ public final class LimboConfig {
         if (dimensionType.equalsIgnoreCase("end")) {
             dimensionType = "the_end";
         }
+
+        String schematicFileName = conf.node("schematic").getString("");
+        if (schematicFileName.isEmpty()) {
+            schematicFile = null;
+        } else {
+            schematicFile = new File(schematicFileName);
+            if (!schematicFile.exists()) {
+                throw new FileNotFoundException("Could not load schematic file: '" + schematicFileName + "'!");
+            }
+        }
+
         gameMode = conf.node("gameMode").getInt();
+
+        spawnPosition = conf.node("spawnPos").get(Location.class);
 
         infoForwarding = conf.node("infoForwarding").get(InfoForwarding.class);
         readTimeout = conf.node("readTimeout").getLong();
@@ -109,8 +121,7 @@ public final class LimboConfig {
                 .register(SocketAddress.class, new SocketAddressSerializer())
                 .register(InfoForwarding.class, new InfoForwarding.Serializer())
                 .register(PingData.class, new PingData.Serializer())
-                .register(BossBar.class, new BossBar.Serializer())
-                .register(Title.class, new Title.Serializer())
+                .register(Location.class, new Location.Serializer())
                 .build();
     }
 
@@ -130,8 +141,16 @@ public final class LimboConfig {
         return dimensionType;
     }
 
+    public File getSchematicFile() {
+        return schematicFile;
+    }
+
     public int getGameMode() {
         return gameMode;
+    }
+
+    public Location getSpawnPosition() {
+        return spawnPosition;
     }
 
     public InfoForwarding getInfoForwarding() {
