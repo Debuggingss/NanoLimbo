@@ -6,8 +6,10 @@ import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketOut;
+import ua.nanit.limbo.server.Log;
 import ua.nanit.limbo.util.BitsUtils;
 import ua.nanit.limbo.util.DataTypeIO;
+import ua.nanit.limbo.world.BlockEntityUtils;
 import ua.nanit.limbo.world.GeneratedBlockDataMappings;
 
 import java.io.ByteArrayOutputStream;
@@ -192,20 +194,18 @@ public class PacketChunk implements PacketOut {
             int x = tag.getInt("x") % 16;
             int y = tag.getInt("y");
             int z = tag.getInt("z") % 16;
+
             String id = tag.getString("id");
+            int intId = BlockEntityUtils.getBlockEntityId(id);
+
+            if (intId == -1) {
+                Log.warning("Unknown block entity type: " + id);
+                continue;
+            }
 
             tag.remove("x");
             tag.remove("y");
             tag.remove("z");
-
-            int intId;
-
-            if (id.equals("minecraft:sign")) {
-                intId = 7;
-            } else {
-                System.out.println("not a sign: " + id);
-                continue;
-            }
 
             output.writeByte(((x & 15) << 4) | (z & 15));
             output.writeShort(y);
