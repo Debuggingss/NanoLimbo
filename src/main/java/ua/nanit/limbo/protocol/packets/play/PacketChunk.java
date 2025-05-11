@@ -3,6 +3,7 @@ package ua.nanit.limbo.protocol.packets.play;
 import net.querz.mca.Chunk;
 import net.querz.mca.Section;
 import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketOut;
 import ua.nanit.limbo.util.BitsUtils;
@@ -28,16 +29,7 @@ public class PacketChunk implements PacketOut {
     private final long[] blockLightBitMasksEmpty;
 
     public PacketChunk() {
-        // what the fuck
-        this.x = 0;
-        this.z = 0;
-        this.chunk = null;
-        this.skylightArrays = null;
-        this.blocklightArrays = null;
-        this.skyLightBitMasks = null;
-        this.blockLightBitMasks = null;
-        this.skyLightBitMasksEmpty = null;
-        this.blockLightBitMasksEmpty = null;
+        this(0, 0, null, Collections.emptyList(), Collections.emptyList());
     }
 
     public PacketChunk(int chunkX, int chunkZ, Chunk chunk, List<Byte[]> skylightArrays, List<Byte[]> blocklightArrays) {
@@ -191,7 +183,33 @@ public class PacketChunk implements PacketOut {
         DataTypeIO.writeVarInt(output, data.length);
         output.write(data);
 
-        DataTypeIO.writeVarInt(output, 0); // NO FUCKING TILE ENTITIES
+        ListTag<CompoundTag> tileEntities = chunk.getTileEntities();
+        DataTypeIO.writeVarInt(output, tileEntities.size());
+
+        for (CompoundTag tag : tileEntities) {
+            int x = tag.getInt("x") % 16;
+            int y = tag.getInt("y");
+            int z = tag.getInt("z") % 16;
+            String id = tag.getString("id");
+
+            tag.remove("x");
+            tag.remove("y");
+            tag.remove("z");
+
+            int intId;
+
+            if (id.equals("minecraft:sign")) {
+                intId = 7;
+            } else {
+                System.out.println("not a sign: " + id);
+                continue;
+            }
+
+            output.writeByte(((x & 15) << 4) | (z & 15));
+            output.writeShort(y);
+            DataTypeIO.writeVarInt(output, intId);
+            DataTypeIO.writeTag(output, tag);
+        }
 
         DataTypeIO.writeVarInt(output, skyLightBitMasks.length);
         for (long l : skyLightBitMasks) {

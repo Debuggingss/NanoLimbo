@@ -85,4 +85,35 @@ public class SchematicConversionUtils {
 
         return tag;
     }
+
+    public static CompoundTag[] unpackBlockStates(long[] blockStates, ListTag<CompoundTag> palette, int width, int height, int length) {
+        int totalBlocks = width * height * length;
+        int paletteSize = palette.size();
+        int bitsPerEntry = Math.max(4, 32 - Integer.numberOfLeadingZeros(paletteSize - 1));
+        int mask = (1 << bitsPerEntry) - 1;
+
+        CompoundTag[] blockNames = new CompoundTag[totalBlocks];
+
+        int bitIndex = 0;
+        for (int i = 0; i < totalBlocks; i++) {
+            int longIndex = bitIndex / 64;
+            int startBit = bitIndex % 64;
+
+            long value;
+            if (startBit + bitsPerEntry <= 64) {
+                value = (blockStates[longIndex] >>> startBit) & mask;
+            } else {
+                int bitsLeft = 64 - startBit;
+                long low = blockStates[longIndex] >>> startBit;
+                long high = blockStates[longIndex + 1] & ((1L << (bitsPerEntry - bitsLeft)) - 1);
+                value = (high << bitsLeft) | low;
+            }
+
+            blockNames[i] = palette.get((int) value);
+
+            bitIndex += bitsPerEntry;
+        }
+
+        return blockNames;
+    }
 }

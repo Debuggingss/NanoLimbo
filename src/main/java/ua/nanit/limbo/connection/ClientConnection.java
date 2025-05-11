@@ -26,6 +26,8 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import net.querz.mca.Chunk;
+import net.querz.nbt.io.NBTUtil;
+import net.querz.nbt.tag.CompoundTag;
 import org.jetbrains.annotations.NotNull;
 import ua.nanit.limbo.connection.pipeline.PacketDecoder;
 import ua.nanit.limbo.connection.pipeline.PacketEncoder;
@@ -38,10 +40,13 @@ import ua.nanit.limbo.protocol.registry.State;
 import ua.nanit.limbo.server.LimboServer;
 import ua.nanit.limbo.server.Log;
 import ua.nanit.limbo.util.UuidUtil;
+import ua.nanit.limbo.world.Litematic;
 import ua.nanit.limbo.world.World;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.File;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.InvalidKeyException;
@@ -145,24 +150,34 @@ public class ClientConnection extends ChannelInboundHandlerAdapter {
 
             writePacket(PacketSnapshots.PACKET_START_WAITING_CHUNKS);
 
-            World world = new World("minecraft:the_end", 32, 32, true);
+            // World world = new World("minecraft:the_end", 32, 32, true);
+            //
+            // for (int x = 0; x < 32; x++) {
+            //     for (int z = 0; z < 32; z++) {
+            //         world.setBlock(x, 0, z, "minecraft:end_stone");
+            //     }
+            // }
+            // world.setBlock(0, 1, 0, "minecraft:torch");
+            // world.setBlock(0, 1, 31, "minecraft:torch");
+            // world.setBlock(31, 1, 0, "minecraft:torch");
+            // world.setBlock(31, 1, 31, "minecraft:torch");
 
-            for (int x = 0; x < 32; x++) {
-                for (int z = 0; z < 32; z++) {
-                    world.setBlock(x, 0, z, "minecraft:end_stone");
-                }
+            World world = null;
+
+            try {
+                world = loadWorld();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            world.setBlock(0, 1, 0, "minecraft:torch");
-            world.setBlock(0, 1, 31, "minecraft:torch");
-            world.setBlock(31, 1, 0, "minecraft:torch");
-            world.setBlock(31, 1, 31, "minecraft:torch");
 
-            for (Chunk[] chunkArray : world.getChunks()) {
-                for (Chunk chunk : chunkArray) {
-                    int x = world.getChunkX(chunk);
-                    int z = world.getChunkZ(chunk);
-                    List<Byte[]> blockChunk = world.getLightEngineBlock().getBlockLightBitMask(x, z);
-                    writePacket(new PacketChunk(x, z, chunk, new ArrayList<>(), blockChunk));
+            if (world != null) {
+                for (Chunk[] chunkArray : world.getChunks()) {
+                    for (Chunk chunk : chunkArray) {
+                        int x = world.getChunkX(chunk);
+                        int z = world.getChunkZ(chunk);
+                        List<Byte[]> blockChunk = world.getLightEngineBlock().getBlockLightBitMask(x, z);
+                        writePacket(new PacketChunk(x, z, chunk, new ArrayList<>(), blockChunk));
+                    }
                 }
             }
 
@@ -170,6 +185,13 @@ public class ClientConnection extends ChannelInboundHandlerAdapter {
         };
 
         sendPlayPackets.run();
+    }
+
+    // TODO: only load world once
+    public World loadWorld() throws IOException {
+        File schem = new File("HypixelLimbo.litematic");
+
+        return Litematic.toWorld("limbo", true, (CompoundTag) NBTUtil.read(schem).getTag());
     }
 
     public void onLoginAcknowledgedReceived() {

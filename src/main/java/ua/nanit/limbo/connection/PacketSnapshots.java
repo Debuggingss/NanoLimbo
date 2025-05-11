@@ -80,7 +80,7 @@ public final class PacketSnapshots {
 
         int teleportId = ThreadLocalRandom.current().nextInt();
 
-        PacketPlayerPositionAndLook positionAndLook = new PacketPlayerPositionAndLook(16, 1, 16, 0, 0, teleportId);
+        PacketPlayerPositionAndLook positionAndLook = new PacketPlayerPositionAndLook(16.5, 22, 8.5, -90, 0, teleportId);
 
         PacketPlayerInfo info = new PacketPlayerInfo();
         info.setGameMode(server.getConfig().getGameMode());

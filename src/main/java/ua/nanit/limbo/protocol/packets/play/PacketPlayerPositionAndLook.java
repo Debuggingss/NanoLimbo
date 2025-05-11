@@ -56,6 +56,6 @@ public class PacketPlayerPositionAndLook implements PacketOut {
         msg.writeFloat(yaw);
         msg.writeFloat(pitch);
 
-        msg.writeInt(0x08);
+        msg.writeInt(0);
     }
 }

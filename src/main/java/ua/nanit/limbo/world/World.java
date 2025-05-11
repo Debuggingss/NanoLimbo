@@ -132,7 +132,7 @@ public class World {
             chunk = Chunk.newChunk();
             this.chunks[(x >> 4)][(z >> 4)] = chunk;
         }
-        chunk.setBlockStateAt(x % 16, y % 16, z % 16, state.toCompoundTag(), false);
+        chunk.setBlockStateAt(x, y, z, state.toCompoundTag(), false);
     }
 
     public Chunk[][] getChunks() {
