@@ -23,7 +23,7 @@ import ua.nanit.limbo.protocol.PacketOut;
 public class PacketPlayerAbilities implements PacketOut {
 
     private int flags = 0x02;
-    private float flyingSpeed = 0.0F;
+    private float flyingSpeed = 0.05F;
     private float fieldOfView = 0.1F;
 
     public void setFlags(int flags) {

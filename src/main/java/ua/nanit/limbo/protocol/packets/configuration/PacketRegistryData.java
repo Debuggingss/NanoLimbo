@@ -7,10 +7,14 @@ import ua.nanit.limbo.world.DimensionRegistry;
 
 public class PacketRegistryData implements PacketOut {
 
-    private DimensionRegistry dimensionRegistry;
+    private final DimensionRegistry dimensionRegistry;
     private MetadataWriter metadataWriter;
 
-    public void setDimensionRegistry(DimensionRegistry dimensionRegistry) {
+    public PacketRegistryData() {
+        this(null);
+    }
+
+    public PacketRegistryData(DimensionRegistry dimensionRegistry) {
         this.dimensionRegistry = dimensionRegistry;
     }
 

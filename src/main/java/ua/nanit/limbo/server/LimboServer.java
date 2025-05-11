@@ -100,7 +100,7 @@ public final class LimboServer {
         commandManager.registerAll(this);
         commandManager.start();
 
-        System.gc();
+        // System.gc();
     }
 
     private void startBootstrap() {

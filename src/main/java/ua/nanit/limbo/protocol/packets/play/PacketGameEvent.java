@@ -5,14 +5,15 @@ import ua.nanit.limbo.protocol.PacketOut;
 
 public class PacketGameEvent implements PacketOut {
 
-    private byte type;
-    private float value;
+    private final byte type;
+    private final float value;
 
-    public void setType(byte type) {
-        this.type = type;
+    public PacketGameEvent() {
+        this((byte) 0, 0);
     }
 
-    public void setValue(float value) {
+    public PacketGameEvent(byte type, float value) {
+        this.type = type;
         this.value = value;
     }
 

@@ -13,5 +13,4 @@ public class PacketKnownPacks implements PacketOut {
         msg.writeString("core");
         msg.writeString(LimboConstants.SUPPORTED_VERSION_NAME);
     }
-
 }

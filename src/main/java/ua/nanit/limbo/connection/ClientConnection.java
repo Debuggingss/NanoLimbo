@@ -25,6 +25,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import net.querz.mca.Chunk;
 import org.jetbrains.annotations.NotNull;
 import ua.nanit.limbo.connection.pipeline.PacketDecoder;
 import ua.nanit.limbo.connection.pipeline.PacketEncoder;
@@ -32,11 +33,12 @@ import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.Packet;
 import ua.nanit.limbo.protocol.PacketOut;
 import ua.nanit.limbo.protocol.packets.login.PacketDisconnect;
-import ua.nanit.limbo.protocol.packets.play.PacketKeepAlive;
+import ua.nanit.limbo.protocol.packets.play.*;
 import ua.nanit.limbo.protocol.registry.State;
 import ua.nanit.limbo.server.LimboServer;
 import ua.nanit.limbo.server.Log;
 import ua.nanit.limbo.util.UuidUtil;
+import ua.nanit.limbo.world.World;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -44,6 +46,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -137,18 +140,31 @@ public class ClientConnection extends ChannelInboundHandlerAdapter {
         Runnable sendPlayPackets = () -> {
             writePacket(PacketSnapshots.PACKET_JOIN_GAME);
             writePacket(PacketSnapshots.PACKET_PLAYER_ABILITIES);
-
             writePacket(PacketSnapshots.PACKET_PLAYER_POS_AND_LOOK);
-            writePacket(PacketSnapshots.PACKET_SPAWN_POSITION);
-
             writePacket(PacketSnapshots.PACKET_DECLARE_COMMANDS);
-
-            if (PacketSnapshots.PACKET_PLUGIN_MESSAGE != null)
-                writePacket(PacketSnapshots.PACKET_PLUGIN_MESSAGE);
 
             writePacket(PacketSnapshots.PACKET_START_WAITING_CHUNKS);
 
-            writePackets(PacketSnapshots.PACKETS_EMPTY_CHUNKS);
+            World world = new World("minecraft:the_end", 32, 32, true);
+
+            for (int x = 0; x < 32; x++) {
+                for (int z = 0; z < 32; z++) {
+                    world.setBlock(x, 0, z, "minecraft:end_stone");
+                }
+            }
+            world.setBlock(0, 1, 0, "minecraft:torch");
+            world.setBlock(0, 1, 31, "minecraft:torch");
+            world.setBlock(31, 1, 0, "minecraft:torch");
+            world.setBlock(31, 1, 31, "minecraft:torch");
+
+            for (Chunk[] chunkArray : world.getChunks()) {
+                for (Chunk chunk : chunkArray) {
+                    int x = world.getChunkX(chunk);
+                    int z = world.getChunkZ(chunk);
+                    List<Byte[]> blockChunk = world.getLightEngineBlock().getBlockLightBitMask(x, z);
+                    writePacket(new PacketChunk(x, z, chunk, new ArrayList<>(), blockChunk));
+                }
+            }
 
             sendKeepAlive();
         };
@@ -158,9 +174,6 @@ public class ClientConnection extends ChannelInboundHandlerAdapter {
 
     public void onLoginAcknowledgedReceived() {
         updateState(State.CONFIGURATION);
-
-        if (PacketSnapshots.PACKET_PLUGIN_MESSAGE != null)
-            writePacket(PacketSnapshots.PACKET_PLUGIN_MESSAGE);
 
         writePacket(PacketSnapshots.PACKET_KNOWN_PACKS);
         writePackets(PacketSnapshots.PACKETS_REGISTRY_DATA_1_21_5);

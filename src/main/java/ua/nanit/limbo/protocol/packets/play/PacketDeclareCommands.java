@@ -20,6 +20,7 @@ package ua.nanit.limbo.protocol.packets.play;
 import ua.nanit.limbo.protocol.ByteMessage;
 import ua.nanit.limbo.protocol.PacketOut;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ import java.util.List;
  */
 public class PacketDeclareCommands implements PacketOut {
 
-    private List<String> commands;
+    private List<String> commands = Collections.emptyList();
 
     public void setCommands(List<String> commands) {
         this.commands = commands;

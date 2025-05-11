@@ -59,14 +59,12 @@ public enum State {
     },
     CONFIGURATION(3) {
         {
-            clientBound.register(PacketPluginMessage::new, 0x01);
             clientBound.register(PacketDisconnect::new, 0x02);
             clientBound.register(PacketFinishConfiguration::new, 0x03);
             clientBound.register(PacketKeepAlive::new, 0x04);
             clientBound.register(PacketKnownPacks::new, 0x0E);
             clientBound.register(PacketUpdateTags::new, 0x0D);
             clientBound.register(PacketRegistryData::new, 0x07);
-            serverBound.register(PacketPluginMessage::new, 0x02);
             serverBound.register(PacketFinishConfiguration::new, 0x03);
             serverBound.register(PacketKeepAlive::new, 0x04);
         }
@@ -76,14 +74,14 @@ public enum State {
             serverBound.register(PacketKeepAlive::new, 0x1A);
             clientBound.register(PacketDeclareCommands::new, 0x10);
             clientBound.register(PacketJoinGame::new, 0x2B);
-            clientBound.register(PacketPluginMessage::new, 0x18);
             clientBound.register(PacketPlayerAbilities::new, 0x39);
             clientBound.register(PacketPlayerPositionAndLook::new, 0x41);
             clientBound.register(PacketKeepAlive::new, 0x26);
             clientBound.register(PacketPlayerInfo::new, 0x3F);
-            clientBound.register(PacketSpawnPosition::new, 0x5A);
             clientBound.register(PacketGameEvent::new, 0x22);
             clientBound.register(PacketEmptyChunk::new, 0x27);
+            clientBound.register(PacketChunk::new, 0x27);
+            clientBound.register(PacketBlockUpdate::new, 0x08);
         }
     };
 
