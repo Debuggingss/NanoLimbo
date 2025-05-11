@@ -9,9 +9,9 @@ General features:
 * Doesn't spawn threads per player. Use a fixed thread pool.
 * Support for **BungeeCord** and **Velocity** info forwarding.
 * Support for [BungeeGuard](https://www.spigotmc.org/resources/79601/) handshake format.
-* Multiple versions support.
 * Fully configurable.
-* Lightweight. App size around **3MB**.
+* Lightweight. App size around **4MB**.
+* Litematic and Schematic world loading
 
 ### Commands
 
