@@ -50,8 +50,8 @@ public class Location {
                     node.node("x").getDouble(0.0),
                     node.node("y").getDouble(0.0),
                     node.node("z").getDouble(0.0),
-                    node.node("yaw").getFloat(0F),
-                    node.node("pitch").getFloat(0F)
+                    node.node("yaw").getFloat(0),
+                    node.node("pitch").getFloat(0)
             );
         }
 

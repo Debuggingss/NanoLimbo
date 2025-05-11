@@ -39,6 +39,11 @@ spawnPos:
   yaw: 0
   pitch: 0
 
+# Freeze the player by making them fly with 0 fly speed.
+# Results in less packet spam from the client falling into the void
+# Useful if no world is being loaded
+freezePlayer: false
+
 # Player info forwarding support.
 # Available types:
 #  - NONE

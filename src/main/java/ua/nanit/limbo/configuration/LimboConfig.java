@@ -43,6 +43,7 @@ public final class LimboConfig {
     private File schematicFile;
     private int gameMode;
     private Location spawnPosition;
+    private boolean freezePlayer;
 
     private InfoForwarding infoForwarding;
     private long readTimeout;
@@ -66,7 +67,7 @@ public final class LimboConfig {
         ConfigurationNode conf = loader.load();
 
         address = conf.node("bind").get(SocketAddress.class);
-        maxPlayers = conf.node("maxPlayers").getInt();
+        maxPlayers = conf.node("maxPlayers").getInt(-1);
         pingData = conf.node("ping").get(PingData.class);
 
         dimensionType = conf.node("dimension").getString("the_end");
@@ -87,13 +88,13 @@ public final class LimboConfig {
             }
         }
 
-        gameMode = conf.node("gameMode").getInt();
-
+        gameMode = conf.node("gameMode").getInt(0);
         spawnPosition = conf.node("spawnPos").get(Location.class);
+        freezePlayer = conf.node("freezePlayer").getBoolean(false);
 
         infoForwarding = conf.node("infoForwarding").get(InfoForwarding.class);
-        readTimeout = conf.node("readTimeout").getLong();
-        debugLevel = conf.node("debugLevel").getInt();
+        readTimeout = conf.node("readTimeout").getLong(30000);
+        debugLevel = conf.node("debugLevel").getInt(2);
 
         useEpoll = conf.node("netty", "useEpoll").getBoolean(true);
         bossGroupSize = conf.node("netty", "threads", "bossGroup").getInt(1);
@@ -151,6 +152,10 @@ public final class LimboConfig {
 
     public Location getSpawnPosition() {
         return spawnPosition;
+    }
+
+    public boolean isFreezePlayer() {
+        return freezePlayer;
     }
 
     public InfoForwarding getInfoForwarding() {

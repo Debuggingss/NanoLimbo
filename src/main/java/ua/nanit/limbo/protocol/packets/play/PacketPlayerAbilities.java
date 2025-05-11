@@ -22,7 +22,8 @@ import ua.nanit.limbo.protocol.PacketOut;
 
 public class PacketPlayerAbilities implements PacketOut {
 
-    private int flags = 0x02;
+    // https://minecraft.wiki/w/Java_Edition_protocol/Packets#Player_Abilities_(clientbound)
+    private int flags = 0;
     private float flyingSpeed = 0.05F;
     private float fieldOfView = 0.1F;
 
@@ -44,5 +45,4 @@ public class PacketPlayerAbilities implements PacketOut {
         msg.writeFloat(flyingSpeed);
         msg.writeFloat(fieldOfView);
     }
-
 }

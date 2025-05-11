@@ -186,7 +186,9 @@ public class PacketChunk implements PacketOut {
         ListTag<CompoundTag> tileEntities = chunk.getTileEntities();
         DataTypeIO.writeVarInt(output, tileEntities.size());
 
-        for (CompoundTag tag : tileEntities) {
+        for (CompoundTag tileEntity : tileEntities) {
+            CompoundTag tag = tileEntity.clone();
+
             int x = tag.getInt("x") % 16;
             int y = tag.getInt("y");
             int z = tag.getInt("z") % 16;

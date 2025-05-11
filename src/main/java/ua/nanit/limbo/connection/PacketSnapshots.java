@@ -76,7 +76,12 @@ public final class PacketSnapshots {
         joinGame.setDimensionRegistry(server.getDimensionRegistry());
 
         PacketPlayerAbilities playerAbilities = new PacketPlayerAbilities();
-        playerAbilities.setFlags(0x04 | 0x08);
+        if (server.getConfig().isFreezePlayer()) {
+            playerAbilities.setFlyingSpeed(0);
+            playerAbilities.setFlags(0x02); // If Flying is set but Allow Flying is unset, the player is unable to stop flying.
+        } else if (server.getConfig().getGameMode() == 1) {
+            playerAbilities.setFlags(0x04 | 0x08); // Allow flying and creative inventory if gamemode is creative
+        }
 
         int teleportId = ThreadLocalRandom.current().nextInt();
 
