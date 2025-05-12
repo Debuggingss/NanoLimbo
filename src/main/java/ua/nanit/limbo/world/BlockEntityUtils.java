@@ -29,7 +29,7 @@ public class BlockEntityUtils {
             Type type = new TypeToken<Map<String, Integer>>() {}.getType();
             mappings = gson.fromJson(reader, type);
         } catch (Exception e) {
-            throw new JsonParseException("Error parsing blocks.json", e);
+            throw new JsonParseException("Error parsing block_entity.json", e);
         }
     }
 

@@ -31,51 +31,42 @@ public final class DimensionRegistry {
 
     private final LimboServer server;
 
-    private Dimension dimension_1_21_4;
-
-    private CompoundBinaryTag codec_1_20;
-    private CompoundBinaryTag codec_1_21_4;
     private CompoundBinaryTag codec_1_21_5;
     private CompoundBinaryTag tags_1_21_5;
+    private Dimension dimension_1_21_5;
 
     public DimensionRegistry(LimboServer server) {
         this.server = server;
-    }
-
-    public CompoundBinaryTag getCodec_1_20() {
-        return codec_1_20;
     }
 
     public CompoundBinaryTag getCodec_1_21_5() {
         return codec_1_21_5;
     }
 
-    public Dimension getDimension_1_21_4() {
-        return dimension_1_21_4;
-    }
-
     public CompoundBinaryTag getTags_1_21_5() {
         return tags_1_21_5;
     }
 
+    public Dimension getDimension_1_21_5() {
+        return dimension_1_21_5;
+    }
+
     public void load(String def) throws IOException {
-        codec_1_20 = readSnbtFile("/dimension/codec_1_20.snbt");
-        codec_1_21_4 = readSnbtFile("/dimension/codec_1_21_4.snbt");
         codec_1_21_5 = readSnbtFile("/dimension/codec_1_21_5.snbt");
 
         tags_1_21_5 = readSnbtFile("/dimension/tags_1_21_5.snbt");
 
-        dimension_1_21_4 = getModernDimension(def, codec_1_21_4);
+        dimension_1_21_5 = getModernDimension(def, codec_1_21_5);
     }
 
     private Dimension getModernDimension(String def, CompoundBinaryTag tag) {
-        ListBinaryTag dimensions = tag.getCompound("minecraft:dimension_type").getList("value");
+        ListBinaryTag dimensions = tag.getList("minecraft:dimension_type");
 
         for (int i = 0; i < dimensions.size(); i++) {
             CompoundBinaryTag dimension = (CompoundBinaryTag) dimensions.get(i);
 
-            String name = dimension.getString("name");
-            CompoundBinaryTag world = (CompoundBinaryTag) dimension.get("element");
+            String name = dimension.getString("id");
+            CompoundBinaryTag world = (CompoundBinaryTag) dimension.get("value");
 
             if (name.startsWith(def)) {
                 return new Dimension(i, name, world);

@@ -41,7 +41,6 @@ public final class PacketSnapshots {
     public static PacketOut PACKET_PLAYER_INFO;
     public static PacketOut PACKET_DECLARE_COMMANDS;
     public static PacketOut PACKET_PLAYER_POS_AND_LOOK;
-    public static PacketOut PACKET_REGISTRY_DATA;
     public static PacketOut PACKET_KNOWN_PACKS;
     public static PacketOut PACKET_UPDATE_TAGS_1_21_5;
     public static List<PacketOut> PACKETS_REGISTRY_DATA_1_21_5;
@@ -104,8 +103,6 @@ public final class PacketSnapshots {
 
         PACKET_UPDATE_TAGS_1_21_5 = createTagData(server.getDimensionRegistry().getTags_1_21_5());
 
-        PACKET_REGISTRY_DATA = new PacketRegistryData(server.getDimensionRegistry());
-
         PACKETS_REGISTRY_DATA_1_21_5 = createRegistryData(server, server.getDimensionRegistry().getCodec_1_21_5());
 
         PACKET_FINISH_CONFIGURATION = new PacketFinishConfiguration();
@@ -121,21 +118,21 @@ public final class PacketSnapshots {
 
     private static List<PacketOut> createRegistryData(LimboServer server, CompoundBinaryTag dimensionTag) {
         List<PacketOut> packetRegistries = new ArrayList<>();
+
         for (String registryType : dimensionTag.keySet()) {
-            CompoundBinaryTag compoundRegistryType = dimensionTag.getCompound(registryType);
+            ListBinaryTag values = dimensionTag.getList(registryType);
 
             PacketRegistryData registryData = new PacketRegistryData(server.getDimensionRegistry());
 
-            ListBinaryTag values = compoundRegistryType.getList("value");
             registryData.setMetadataWriter(message -> {
                 message.writeString(registryType);
-
                 message.writeVarInt(values.size());
+
                 for (BinaryTag entry : values) {
                     CompoundBinaryTag entryTag = (CompoundBinaryTag) entry;
 
-                    String name = entryTag.getString("name");
-                    CompoundBinaryTag element = entryTag.getCompound("element", null);
+                    String name = entryTag.getString("id");
+                    CompoundBinaryTag element = entryTag.getCompound("value", null);
 
                     message.writeString(name);
                     if (element != null) {

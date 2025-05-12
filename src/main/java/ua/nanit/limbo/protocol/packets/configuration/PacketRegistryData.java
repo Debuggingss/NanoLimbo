@@ -28,6 +28,6 @@ public class PacketRegistryData implements PacketOut {
             metadataWriter.writeData(msg);
             return;
         }
-        msg.writeNamelessCompoundTag(dimensionRegistry.getCodec_1_20());
+        msg.writeNamelessCompoundTag(dimensionRegistry.getCodec_1_21_5());
     }
 }
